@@ -3,7 +3,7 @@ using WebAPIDemo.Entities.Domain;
 
 namespace WebAPIDemo.Entities.DTO
 {
-    public class UserDetailDTO
+    public class UserDetailsDTO
     {
         public string UserName { get; set; }
         public string FirstName { get; set; }

@@ -2,7 +2,6 @@
 
 namespace WebAPIDemo.Entities.Domain
 {
-    
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Role
     {

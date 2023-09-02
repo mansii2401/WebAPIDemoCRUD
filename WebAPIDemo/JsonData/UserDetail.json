@@ -1,3 +1,29 @@
-{
-
-}
+[
+  {
+    "Id": 0,
+    "FirstName": "Mansi",
+    "LastName": "Rani",
+    "UserEmail": "mansi.rani@gmail.com",
+    "Role": "Employee",
+    "IsStudent": false,
+    "UserId": 1
+  },
+  {
+    "Id": 1,
+    "FirstName": "Manas",
+    "LastName": "Mishra",
+    "UserEmail": "manas@example.com",
+    "Role": "Student",
+    "IsStudent": true,
+    "UserId": 2
+  },
+  {
+    "Id": 2,
+    "FirstName": "Mishu",
+    "LastName": "Mishra",
+    "UserEmail": "mishu@example.com",
+    "Role": "Student",
+    "IsStudent": true,
+    "UserId": 3
+  }
+]

@@ -5,36 +5,45 @@ using WebAPIDemo.Entities.DTO;
 
 namespace WebAPIDemo.Repositories
 {
-        public class UserData
+    public class UserRepository<T> : ISchoolRepository<T> where T : class
+    {
+
+        public List<T> ReadUsers(string path)
+        {
+            string ReadAllUsers = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<List<T>>(ReadAllUsers);
+
+        }
+        public void SaveUser(string path, List<T> ReadAllUsers)
+        {
+            string SaveUser = JsonSerializer.Serialize(ReadAllUsers);
+            File.WriteAllText(path, SaveUser);
+        }
+
+        public ActionResult<Response<List<T>>> GetUserDetails()
         {
 
-
-            public List<User> GetAllUsers()
+            string ReadAllUsers = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json");
+            var user = JsonSerializer.Deserialize<List<User>>(ReadAllUsers);
+            try
             {
-                string ReadAllUsers = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json");
-                return JsonSerializer.Deserialize<List<User>>(ReadAllUsers);
-            }
-
-            public ActionResult<Response<List<UserDetailDTO>>> GetUserDetails()
-            {
-                string ReadAllUsers = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json");
-                var user = JsonSerializer.Deserialize<List<User>>(ReadAllUsers);
                 if (user.Count == 0)
                 {
-                    return new Response<List<UserDetailDTO>>
+                    return new Response<List<T>>
                     {
-                        StatusMessage = "No users present!."
+
+                        ErrorMessage = "No users present!."
                     };
                 }
                 else
                 {
                     string ReadAllUserDetails = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserDetail.json");
-                    var userdetails = JsonSerializer.Deserialize<List<UserDetail>>(ReadAllUserDetails);
+                    var userdetails = JsonSerializer.Deserialize<List<UserDetails>>(ReadAllUserDetails);
                     if (userdetails.Count == 0)
                     {
-                        return new Response<List<UserDetailDTO>>
+                        return new Response<List<T>>
                         {
-                            StatusMessage = "No users data Found."
+                            ErrorMessage = "No users data Found."
                         };
                     }
                     else
@@ -43,7 +52,7 @@ namespace WebAPIDemo.Repositories
 
                         var result = (from item in user
                                       join itemdetails in userdetails on item.UserId equals itemdetails.UserId
-                                      select new UserDetailDTO()
+                                      select new UserDetailsDTO()
                                       {
                                           UserId = item.UserId,
                                           UserName = item.UserName,
@@ -55,16 +64,17 @@ namespace WebAPIDemo.Repositories
                                       }).ToList();
                         if (result.Count > 0)
                         {
-                            return new Response<List<UserDetailDTO>>
+
+                            return new Response<List<T>>
                             {
-                                Result = result,
+                                //Result = result,
                                 StatusMessage = "Ok"
                             };
                         }
 
                         else
                         {
-                            return new Response<List<UserDetailDTO>>
+                            return new Response<List<T>>
                             {
                                 StatusMessage = "No Matching Records found"
                             };
@@ -74,15 +84,24 @@ namespace WebAPIDemo.Repositories
                     }
                 }
             }
-
-
-
-            public ActionResult<Response<AddUserDTO>> AddUser(AddUserDTO userdto)
+            catch (Exception ex)
             {
-                string ReadAllUser = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json");
-                var UserUpdated = JsonSerializer.Deserialize<List<User>>(ReadAllUser);
 
-                var usercheck = (from e in UserUpdated where e.UserName.Equals(userdto.UserName) select e).Count();
+                throw ex;
+            }
+        }
+
+
+
+
+        public ActionResult<Response<AddUserDTO>> AddUserDetails(AddUserDTO userdto)
+        {
+            string ReadAllUser = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json");
+            var UserUpdated = JsonSerializer.Deserialize<List<User>>(ReadAllUser);
+
+            var usercheck = (from e in UserUpdated where e.UserName.Equals(userdto.UserName) select e).Count();
+            try
+            {
                 if (usercheck > 0)
                     return new Response<AddUserDTO>
                     {
@@ -90,11 +109,11 @@ namespace WebAPIDemo.Repositories
                         StatusMessage = "User already exists"
                     };
                 var maxIduser = (from e in UserUpdated orderby e.UserId descending select e.UserId).FirstOrDefault();
-                userdto.UserId = maxIduser + 1;
+                var IdUser = maxIduser + 1;
 
                 var adduser = new User()
                 {
-                    UserId = userdto.UserId,
+                    UserId = IdUser,
                     UserName = userdto.UserName,
                     Password = userdto.Password,
                 };
@@ -106,15 +125,15 @@ namespace WebAPIDemo.Repositories
                 File.WriteAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json", json);
 
                 string ReadAllUser1 = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserDetail.json");
-                var UserUpdated1 = JsonSerializer.Deserialize<List<UserDetail>>(ReadAllUser1);
+                var UserUpdated1 = JsonSerializer.Deserialize<List<UserDetails>>(ReadAllUser1);
 
                 var maxId = (from e in UserUpdated1 orderby e.Id descending select e.Id).FirstOrDefault();
-                userdto.Id = maxId + 1;
+                var IdEntry = maxId + 1;
 
-                var adduser2 = new UserDetail()
+                var adduser2 = new UserDetails()
                 {
-                    Id = userdto.Id,
-                    UserId = userdto.UserId,
+                    Id = IdEntry,
+                    UserId = IdUser,
 
                     FirstName = userdto.FirstName,
                     LastName = userdto.LastName,
@@ -133,17 +152,22 @@ namespace WebAPIDemo.Repositories
                     Result = userdto,
                     StatusMessage = "Data has been added successfully!."
                 };
-                ;
             }
-
-
-
-            public ActionResult<Response<AddUserDTO>> GetUserDetailsById(int userid)
+            catch (Exception ex)
             {
 
+                throw ex;
+            }
+        }
 
-                string userdetails = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json");
-                var users = JsonSerializer.Deserialize<List<User>>(userdetails);
+        public ActionResult<Response<AddUserDTO>> GetUserDetailsById(int userid)
+        {
+
+
+            string userdetails = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserEntry.json");
+            var users = JsonSerializer.Deserialize<List<User>>(userdetails);
+            try
+            {
                 if (users.Count == 0)
                 {
                     return new Response<AddUserDTO>
@@ -154,7 +178,7 @@ namespace WebAPIDemo.Repositories
                 else
                 {
                     string Details = File.ReadAllText(@"C:\Users\mansi\source\repos\WebAPIDemo\WebAPIDemo\JsonData\UserDetail.json");
-                    var userdetails1 = JsonSerializer.Deserialize<List<UserDetail>>(Details);
+                    var userdetails1 = JsonSerializer.Deserialize<List<UserDetails>>(Details);
                     if (userdetails1 != null)
                     {
 
@@ -165,7 +189,6 @@ namespace WebAPIDemo.Repositories
                                       {
                                           UserName = item.UserName,
                                           Password = item.Password,
-                                          UserId = item.UserId,
                                           FirstName = itemDetail.FirstName,
                                           LastName = itemDetail.LastName,
                                           UserEmail = itemDetail.UserEmail,
@@ -196,9 +219,41 @@ namespace WebAPIDemo.Repositories
                         };
                     }
                 }
-
             }
 
-        }
-    }
 
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+
+
+        public ActionResult<Response<UserLogin>> LoginUser(UserLogin userlogin)
+        {
+            string ReadAllUser = File.ReadAllText(@"C:\Users\parom\source\repos\Abhishek\Abhishek\JsonData\UserEntry.json");
+            var UserUpdated = JsonSerializer.Deserialize<List<User>>(ReadAllUser);
+
+            var usercheck = (from e in UserUpdated where e.UserName.Equals(userlogin.UserName) select e).Count();
+            if (usercheck > 0)
+            {
+                return new Response<UserLogin>
+                {
+                    StatusMessage = "User login successfull"
+                };
+            }
+            else
+            {
+
+                return new Response<UserLogin>
+                {
+                    StatusMessage = "User credentials does not exist"
+                };
+            }
+        }
+
+
+    }
+}

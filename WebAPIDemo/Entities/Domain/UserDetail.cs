@@ -4,9 +4,8 @@ using System.Data;
 
 namespace WebAPIDemo.Entities.Domain
 {
-    public class UserDetail
+    public class UserDetails
     {
-
         [Key]
         public int Id { get; set; }
         public string FirstName { get; set; }

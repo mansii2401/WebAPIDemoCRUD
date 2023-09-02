@@ -7,7 +7,6 @@ using WebAPIDemo.Services;
 
 namespace WebAPIDemo.Controllers
 {
-    
     [Route("api/[Controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -15,28 +14,32 @@ namespace WebAPIDemo.Controllers
         UserService userService = new UserService();
 
 
-        [HttpGet]
-        public List<User> GetAllUsers()
-        {
-            return userService.GetAllUsers();
-        }
-        [HttpGet("UserDetails/{id}")]
+
+        [HttpGet("UserDetails/id")]
         public ActionResult<Response<AddUserDTO>> GetUserDetailsById(int userid)
         {
             return userService.GetUserDetailsById(userid);
         }
-        [HttpPost]
-        public ActionResult<Response<AddUserDTO>> AddUser(AddUserDTO userdto)
+        [HttpPost("UserDetails")]
+        public ActionResult<Response<AddUserDTO>> AddUserDetails(AddUserDTO userdto)
         {
-            return userService.AddUser(userdto);
+            return userService.AddUserDetails(userdto);
+
+
         }
 
         [HttpGet("UserDetails")]
-        public ActionResult<Response<List<UserDetailDTO>>> GetUserDetails()
+        public ActionResult<Response<List<T>>> GetUserDetails()
         {
             return userService.GetUserDetails();
         }
+        [HttpPost("UserLogin")]
+        public ActionResult<Response<UserLogin>> LoginUser(UserLogin userlogin)
+        {
+            return userService.LoginUser(userlogin);
+
+        }
 
     }
-
 }
+
